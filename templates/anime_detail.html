@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ anime.title }} - AnimeEvol</title>
+    <meta name="description" content="{{ anime.synopsis[:160] }}...">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header class="site-header">
+        <nav class="main-nav">
+            <div class="nav-container">
+                <div class="logo">
+                    <a href="/" aria-label="Go to homepage" class="logo-link">
+                        <i class="fas fa-play-circle" aria-hidden="true"></i>
+                        <span>AnimeEvolLL</span>
+                    </a>
+                </div>
+                <div class="nav-links">
+                    <a href="/" class="nav-link"><i class="fas fa-home" aria-hidden="true"></i> Home</a>
+                    <a href="#trending" class="nav-link"><i class="fas fa-fire" aria-hidden="true"></i> Trending</a>
+                    <a href="#seasonal" class="nav-link"><i class="fas fa-calendar" aria-hidden="true"></i> New Season</a>
+                    <div class="dropdown">
+                        <button type="button" class="nav-link dropdown-toggle">
+                            <i class="fas fa-list" aria-hidden="true"></i> Categories
+                            <i class="fas fa-chevron-down" aria-hidden="true"></i>
+                        </button>
+                        <div class="dropdown-menu">
+                            <a href="#" class="dropdown-item">Action</a>
+                            <a href="#" class="dropdown-item">Adventure</a>
+                            <a href="#" class="dropdown-item">Comedy</a>
+                            <a href="#" class="dropdown-item">Drama</a>
+                            <a href="#" class="dropdown-item">Fantasy</a>
+                            <a href="#" class="dropdown-item">View All</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="search-bar">
+                    <form action="/search" method="GET" class="search-form" id="searchForm">
+                        <input type="text" name="q" placeholder="Search anime..." aria-label="Search anime">
+                        <button type="submit" class="search-button">
+                            <i class="fas fa-search" aria-hidden="true"></i>
+                            <span class="sr-only">Search</span>
+                        </button>
+                    </form>
+                    <div class="search-results" style="display: none;"></div>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <main class="anime-detail-page">
+        <div class="anime-banner" style="background-image: linear-gradient(to bottom, rgba(26, 27, 30, 0.8), var(--background-color)), url('{{ anime.images.jpg.large_image_url }}');">
+            <div class="banner-content">
+                <div class="anime-info-container">
+                    <div class="anime-cover-container">
+                        <img src="{{ anime.images.jpg.large_image_url }}" alt="{{ anime.title }}" class="anime-cover">
+                        {% if anime.status %}
+                        <div class="anime-status">{{ anime.status }}</div>
+                        {% endif %}
+                        {% if anime.score %}
+                        <div class="anime-rating">
+                            <i class="fas fa-star"></i>
+                            <span>{{ "%.2f"|format(anime.score) }}</span>
+                        </div>
+                        {% endif %}
+                    </div>
+                    <div class="anime-info">
+                        <div class="anime-titles">
+                            <h1>{{ anime.title }}</h1>
+                            {% if anime.title_japanese %}
+                            <div class="japanese-title">{{ anime.title_japanese }}</div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="anime-meta">
+                            {% if anime.type %}
+                            <span class="meta-item">
+                                <i class="fas fa-tv"></i>
+                                {{ anime.type }}
+                            </span>
+                            {% endif %}
+                            {% if anime.episodes %}
+                            <span class="meta-item">
+                                <i class="fas fa-film"></i>
+                                {{ anime.episodes }} Episodes
+                            </span>
+                            {% endif %}
+                            {% if anime.duration %}
+                            <span class="meta-item">
+                                <i class="fas fa-clock"></i>
+                                {{ anime.duration }}
+                            </span>
+                            {% endif %}
+                            {% if anime.aired %}
+                            <span class="meta-item">
+                                <i class="fas fa-calendar"></i>
+                                {{ anime.aired.string }}
+                            </span>
+                            {% endif %}
+                        </div>
+
+                        {% if anime.genres %}
+                        <div class="genres">
+                            {% for genre in anime.genres %}
+                            <a href="#" class="genre-tag">{{ genre.name }}</a>
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+
+                        <div class="synopsis">
+                            <h3>Synopsis</h3>
+                            <p>{{ anime.synopsis }}</p>
+                        </div>
+
+                        <div class="action-buttons">
+                            <button class="action-btn watch-btn">
+                                <i class="fas fa-play"></i>
+                                Watch Now
+                            </button>
+                            <button class="action-btn add-list-btn">
+                                <i class="fas fa-plus"></i>
+                                Add to List
+                            </button>
+                            <button class="action-btn share-btn">
+                                <i class="fas fa-share"></i>
+                                Share
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="content-wrapper">
+            <section class="episode-section">
+                <div class="episode-header">
+                    <h2>Episodes</h2>
+                    <div class="episode-controls">
+                        <div class="episode-filters">
+                            <button class="filter-btn active">All</button>
+                            <button class="filter-btn">Subbed</button>
+                            <button class="filter-btn">Dubbed</button>
+                        </div>
+                        <button class="sort-btn">
+                            <i class="fas fa-sort"></i>
+                            Sort
+                        </button>
+                    </div>
+                </div>
+
+                <div class="episode-list">
+                    {% if anime.episodes %}
+                        {% for i in range(anime.episodes) %}
+                        <div class="episode-card">
+                            <div class="episode-thumbnail">
+                                <img src="{{ anime.images.jpg.large_image_url }}" alt="Episode {{ i + 1 }}">
+                                <span class="episode-duration">24:00</span>
+                                <button class="play-episode">
+                                    <i class="fas fa-play"></i>
+                                </button>
+                            </div>
+                            <div class="episode-info">
+                                <div class="episode-number">Episode {{ i + 1 }}</div>
+                                <div class="episode-title">Episode {{ i + 1 }}</div>
+                                <div class="episode-meta">
+                                    <span class="sub-label">
+                                        <i class="fas fa-closed-captioning"></i>
+                                        SUB
+                                    </span>
+                                    <span class="quality-label">
+                                        <i class="fas fa-video"></i>
+                                        HD
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="no-episodes">
+                            <i class="fas fa-exclamation-circle"></i>
+                            <p>No episodes available yet.</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </section>
+
+            {% if recommendations %}
+            <section class="recommendations-section">
+                <h2>You May Also Like</h2>
+                <div class="recommendations-grid">
+                    {% for rec in recommendations %}
+                    <div class="anime-card">
+                        <div class="anime-card-image">
+                            <img src="{{ rec.images.jpg.large_image_url }}" alt="{{ rec.title }}">
+                            <div class="anime-card-overlay">
+                                <a href="/anime/{{ rec.mal_id }}" class="watch-now">
+                                    <i class="fas fa-play"></i>
+                                </a>
+                            </div>
+                            {% if rec.score %}
+                            <div class="anime-rating">
+                                <i class="fas fa-star"></i>
+                                <span>{{ "%.1f"|format(rec.score) }}</span>
+                            </div>
+                            {% endif %}
+                            {% if rec.type %}
+                            <div class="anime-type">{{ rec.type }}</div>
+                            {% endif %}
+                        </div>
+                        <div class="anime-card-content">
+                            <h3 class="anime-title">
+                                <a href="/anime/{{ rec.mal_id }}">{{ rec.title }}</a>
+                            </h3>
+                            <div class="anime-meta">
+                                {% if rec.episodes %}
+                                <span>
+                                    <i class="fas fa-film"></i>
+                                    {{ rec.episodes }} Ep
+                                </span>
+                                {% endif %}
+                                {% if rec.duration %}
+                                <span>
+                                    <i class="fas fa-clock"></i>
+                                    {{ rec.duration.split(' ')[0] }}m
+                                </span>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </section>
+            {% endif %}
+        </div>
+    </main>
+
+    <footer class="site-footer">
+        <div class="footer-content">
+            <div class="footer-section">
+                <h3>AnimeEvolLL</h3>
+                <p>Your ultimate destination for anime streaming with Indonesian subtitles.</p>
+                <div class="social-links">
+                    <a href="https://github.com/LarkLucifer" aria-label="Follow me on Github">
+                        <i class="fab fa-github" aria-hidden="true"></i>
+                    </a>
+                </div>
+            </div>
+            <div class="footer-section">
+                <h3>Newsletter</h3>
+                <p>Stay updated with the latest anime releases!</p>
+                <form class="newsletter-form">
+                    <input type="email" placeholder="Enter your email" aria-label="Email for newsletter">
+                    <button type="submit">Subscribe</button>
+                </form>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2024 AnimeEvolLL. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>

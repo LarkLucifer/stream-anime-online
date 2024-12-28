@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AnimeEvol - Watch Anime Online</title>
+    <meta name="description" content="Watch your favorite anime online with Indonesian subtitles on AnimeEvol">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header class="site-header">
+        <nav class="main-nav">
+            <div class="nav-container">
+                <div class="logo">
+                    <a href="/" aria-label="Go to homepage" class="logo-link">
+                        <i class="fas fa-play-circle" aria-hidden="true"></i>
+                        <span>AnimeEvolLL</span>
+                    </a>
+                </div>
+                <div class="nav-links">
+                    <a href="/" class="nav-link active"><i class="fas fa-home" aria-hidden="true"></i> Home</a>
+                    <a href="#trending" class="nav-link"><i class="fas fa-fire" aria-hidden="true"></i> Trending</a>
+                    <a href="#seasonal" class="nav-link"><i class="fas fa-calendar" aria-hidden="true"></i> New Season</a>
+                    <div class="dropdown">
+                        <button type="button" class="nav-link dropdown-toggle">
+                            <i class="fas fa-list" aria-hidden="true"></i> Categories
+                            <i class="fas fa-chevron-down" aria-hidden="true"></i>
+                        </button>
+                        <div class="dropdown-menu">
+                            <a href="#" class="dropdown-item">Action</a>
+                            <a href="#" class="dropdown-item">Adventure</a>
+                            <a href="#" class="dropdown-item">Comedy</a>
+                            <a href="#" class="dropdown-item">Drama</a>
+                            <a href="#" class="dropdown-item">Fantasy</a>
+                            <a href="#" class="dropdown-item">View All</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="search-bar">
+                    <form action="/search" method="GET" class="search-form" id="searchForm">
+                        <input type="text" name="q" placeholder="Search anime..." aria-label="Search anime">
+                        <button type="submit" class="search-button">
+                            <i class="fas fa-search" aria-hidden="true"></i>
+                            <span class="sr-only">Search</span>
+                        </button>
+                    </form>
+                    <div class="search-results" style="display: none;"></div>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <section class="hero-section">
+            <div class="hero-content">
+                <h1>Welcome to AnimeEvolLL</h1>
+                <p>Watch your favorite anime anytime, anywhere with Indonesian subtitles</p>
+                <div class="hero-buttons">
+                    <a href="#popular" class="hero-btn primary">
+                        <i class="fas fa-play" aria-hidden="true"></i> Start Watching
+                    </a>
+                    <a href="#trending" class="hero-btn secondary">
+                        <i class="fas fa-fire" aria-hidden="true"></i> Trending Now
+                    </a>
+                </div>
+            </div>
+            <div class="hero-overlay"></div>
+        </section>
+
+        <section id="trending" class="anime-section">
+            <div class="section-header">
+                <h2><i class="fas fa-fire" aria-hidden="true"></i> Trending Now</h2>
+                <a href="#" class="view-all">View All <i class="fas fa-arrow-right" aria-hidden="true"></i></a>
+            </div>
+            <div class="anime-slider">
+                {% for anime in trending_anime %}
+                <div class="anime-card">
+                    <div class="anime-card-image">
+                        <img src="{{ anime.images.jpg.large_image_url }}" 
+                             alt="{{ anime.title }}"
+                             loading="lazy">
+                        <div class="anime-card-overlay">
+                            <a href="/anime/{{ anime.mal_id }}" class="watch-now">
+                                <i class="fas fa-play" aria-hidden="true"></i>
+                            </a>
+                        </div>
+                        {% if anime.score %}
+                        <div class="anime-rating">
+                            <i class="fas fa-star" aria-hidden="true"></i>
+                            <span>{{ "%.1f"|format(anime.score) }}</span>
+                        </div>
+                        {% endif %}
+                        <div class="anime-type">{{ anime.type }}</div>
+                    </div>
+                    <div class="anime-card-content">
+                        <h3 class="anime-title">
+                            <a href="/anime/{{ anime.mal_id }}">{{ anime.title }}</a>
+                        </h3>
+                        <div class="anime-meta">
+                            <span><i class="fas fa-film" aria-hidden="true"></i> {{ anime.episodes or '?' }} Ep</span>
+                            <span><i class="fas fa-clock" aria-hidden="true"></i> {{ anime.duration.split(' ')[0] }}m</span>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </section>
+
+        <section id="seasonal" class="anime-section">
+            <div class="section-header">
+                <h2><i class="fas fa-calendar" aria-hidden="true"></i> New Season</h2>
+                <a href="#" class="view-all">View All <i class="fas fa-arrow-right" aria-hidden="true"></i></a>
+            </div>
+            <div class="anime-grid">
+                {% for anime in seasonal_anime %}
+                <div class="anime-card">
+                    <div class="anime-card-image">
+                        <img src="{{ anime.images.jpg.large_image_url }}" 
+                             alt="{{ anime.title }}"
+                             loading="lazy">
+                        <div class="anime-card-overlay">
+                            <a href="/anime/{{ anime.mal_id }}" class="watch-now">
+                                <i class="fas fa-play" aria-hidden="true"></i>
+                            </a>
+                        </div>
+                        {% if anime.score %}
+                        <div class="anime-rating">
+                            <i class="fas fa-star" aria-hidden="true"></i>
+                            <span>{{ "%.1f"|format(anime.score) }}</span>
+                        </div>
+                        {% endif %}
+                        <div class="anime-type">{{ anime.type }}</div>
+                    </div>
+                    <div class="anime-card-content">
+                        <h3 class="anime-title">
+                            <a href="/anime/{{ anime.mal_id }}">{{ anime.title }}</a>
+                        </h3>
+                        <div class="anime-meta">
+                            <span><i class="fas fa-film" aria-hidden="true"></i> {{ anime.episodes or '?' }} Ep</span>
+                            <span><i class="fas fa-clock" aria-hidden="true"></i> {{ anime.duration.split(' ')[0] }}m</span>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </section>
+
+        <section id="popular" class="anime-section">
+            <div class="section-header">
+                <h2><i class="fas fa-star" aria-hidden="true"></i> Popular Anime</h2>
+                <a href="#" class="view-all">View All <i class="fas fa-arrow-right" aria-hidden="true"></i></a>
+            </div>
+            <div class="anime-grid">
+                {% for anime in popular_anime %}
+                <div class="anime-card">
+                    <div class="anime-card-image">
+                        <img src="{{ anime.images.jpg.large_image_url }}" 
+                             alt="{{ anime.title }}"
+                             loading="lazy">
+                        <div class="anime-card-overlay">
+                            <a href="/anime/{{ anime.mal_id }}" class="watch-now">
+                                <i class="fas fa-play" aria-hidden="true"></i>
+                            </a>
+                        </div>
+                        {% if anime.score %}
+                        <div class="anime-rating">
+                            <i class="fas fa-star" aria-hidden="true"></i>
+                            <span>{{ "%.1f"|format(anime.score) }}</span>
+                        </div>
+                        {% endif %}
+                        <div class="anime-type">{{ anime.type }}</div>
+                    </div>
+                    <div class="anime-card-content">
+                        <h3 class="anime-title">
+                            <a href="/anime/{{ anime.mal_id }}">{{ anime.title }}</a>
+                        </h3>
+                        <div class="anime-meta">
+                            <span><i class="fas fa-film" aria-hidden="true"></i> {{ anime.episodes or '?' }} Ep</span>
+                            <span><i class="fas fa-clock" aria-hidden="true"></i> {{ anime.duration.split(' ')[0] }}m</span>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </section>
+    </main>
+
+    <footer class="site-footer">
+        <div class="footer-content">
+            <div class="footer-section">
+                <h3>AnimeEvolLL</h3>
+                <p>Your ultimate destination for anime streaming with Indonesian subtitles.</p>
+                <div class="social-links">
+                    <a href="https://github.com/LarkLucifer" aria-label="Follow me on Github">
+                        <i class="fab fa-github" aria-hidden="true"></i>
+                    </a>
+                </div>
+            </div>
+            <div class="footer-section">
+                <h3>Newsletter</h3>
+                <p>Stay updated with the latest anime releases!</p>
+                <form class="newsletter-form">
+                    <input type="email" placeholder="Enter your email" aria-label="Email for newsletter">
+                    <button type="submit">Subscribe</button>
+                </form>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2024 AnimeEvolLL. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>
